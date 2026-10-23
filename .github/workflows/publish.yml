@@ -1,0 +1,46 @@
+name: publish
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  test:
+    uses: ./.github/workflows/test.yml
+
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: "29"
+          gleam-version: "1.18.1"
+          rebar3-version: "3"
+      # Hex rejects a version that is already published, so only publish
+      # when the version in gleam.toml is new.
+      - id: version
+        run: |
+          name=$(sed -n 's/^name = "\(.*\)"/\1/p' gleam.toml)
+          version=$(sed -n 's/^version = "\(.*\)"/\1/p' gleam.toml)
+          status=$(curl -s -o /dev/null -w '%{http_code}' "https://hex.pm/api/packages/$name/releases/$version")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if [ "$status" = "200" ]; then
+            echo "$name $version is already on Hex, skipping"
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          elif [ "$status" = "404" ]; then
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Unexpected status $status from Hex"
+            exit 1
+          fi
+      - run: gleam publish --yes
+        if: steps.version.outputs.publish == 'true'
+        env:
+          HEXPM_API_KEY: ${{ secrets.HEXPM_API_KEY }}

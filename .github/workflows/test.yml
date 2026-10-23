@@ -1,11 +1,9 @@
 name: test
 
 on:
-  push:
-    branches:
-      - master
-      - main
   pull_request:
+  # Pushes to main run these tests through publish.yml.
+  workflow_call:
 
 jobs:
   test:

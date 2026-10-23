@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v1.0.0 - 2026-10-23
 
 - The minimum Gleam version is now 1.14, the oldest release that the
   `gleam_stdlib` 1.x dependency supports.
