@@ -21,7 +21,7 @@ jobs:
       - uses: erlef/setup-beam@v1
         with:
           otp-version: "29"
-          gleam-version: "1.18.1"
+          gleam-version: "1.19.2"
           rebar3-version: "3"
       # Hex rejects a version that is already published, so only publish
       # when the version in gleam.toml is new.
