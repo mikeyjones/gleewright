@@ -1,0 +1,12 @@
+{
+  "name": "gleewright",
+  "description": "Playwright-powered end-to-end testing for Gleam",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "gleam test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0"
+  }
+}
